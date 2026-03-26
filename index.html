@@ -7,9 +7,9 @@
 <link rel="stylesheet" href="https://use.typekit.net/otl6ozb.css">
 <style>
   :root {
-    --bg: #161f2a;
-    --surface: #161f2a;
-    --surface2: #161f2a;
+    --bg: #19212E;
+    --surface: #19212E;
+    --surface2: #19212E;
     --border: rgba(255,255,255,0.08);
     --border-hover: rgba(255,255,255,0.18);
     --text: #d4cfc8;
@@ -404,23 +404,33 @@
   }
   .zoom-btn:hover { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
 
-  .reset-zoom-btn {
+  .top-btn-group {
     position: absolute;
     top: 18px;
     right: 24px;
-    padding: 6px 12px;
-    background: var(--surface);
-    border: 1px solid var(--border-hover);
-    border-radius: 6px;
-    color: var(--text-dim);
-    font-size: 11px;
-    font-family: var(--font);
-    letter-spacing: 0;
-    cursor: pointer;
+    display: flex;
+    gap: 6px;
     z-index: 10;
+  }
+
+  .reset-zoom-btn, .node-builder-btn {
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text-dim);
+    font-size: 10px;
+    font-family: 'articulat-cf', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    cursor: pointer;
     transition: all 0.15s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
   }
   .reset-zoom-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .node-builder-btn:hover { border-color: var(--accent); color: var(--accent); }
 
   /* ── ACTIVE FILTER TAGS ── */
   .active-tags {
@@ -602,7 +612,10 @@
       <div id="loading-analog">Loading Analog map…</div>
     </div>
     <div class="active-tags" id="active-tags-analog"></div>
-    <button class="reset-zoom-btn" id="reset-zoom-analog">Reset view</button>
+    <div class="top-btn-group">
+      <button class="reset-zoom-btn" id="reset-zoom-analog">Reset view</button>
+      <a class="node-builder-btn" href="https://cquintos-23.github.io/nostalgia/" target="_self">Node builder</a>
+    </div>
     <div class="zoom-controls">
       <button class="zoom-btn" id="zoom-in-analog">+</button>
       <button class="zoom-btn" id="zoom-out-analog">−</button>
@@ -631,7 +644,10 @@
       <div id="loading-digital">Loading Digital map…</div>
     </div>
     <div class="active-tags" id="active-tags-digital"></div>
-    <button class="reset-zoom-btn" id="reset-zoom-digital">Reset view</button>
+    <div class="top-btn-group">
+      <button class="reset-zoom-btn" id="reset-zoom-digital">Reset view</button>
+      <a class="node-builder-btn" href="https://cquintos-23.github.io/nostalgia/" target="_self">Node builder</a>
+    </div>
     <div class="zoom-controls">
       <button class="zoom-btn" id="zoom-in-digital">+</button>
       <button class="zoom-btn" id="zoom-out-digital">−</button>

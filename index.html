@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memory Map</title>
+<link rel="stylesheet" href="https://use.typekit.net/otl6ozb.css">
+<style>
+  :root {
+    --bg: #161f2a;
+    --surface: #161f2a;
+    --surface2: #161f2a;
+    --border: rgba(255,255,255,0.08);
+    --border-hover: rgba(255,255,255,0.18);
+    --text: #d4cfc8;
+    --text-dim: rgba(212,207,200,0.45);
+    --text-bright: #edeae4;
+    --accent: #5154F0;
+    --accent-soft: rgba(81,84,240,0.15);
+    --accent-analog: #5154F0;
+    --accent-digital: #4FA89E;
+    --font: 'articulat-cf', 'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 13px;
+    letter-spacing: -0.02em;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── SIDEBAR ── */
+  #sidebar {
+    width: 260px;
+    min-width: 260px;
+    height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: width 0.25s ease, min-width 0.25s ease;
+    z-index: 30;
+  }
+
+  #sidebar-header {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #sidebar-header h1 {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    color: var(--text-bright);
+    margin-bottom: 2px;
+  }
+  #sidebar-header p {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0;
+  }
+
+  /* ── MAP MODE SWITCHER ── */
+  #mode-switcher {
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .mode-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    letter-spacing: 0;
+    margin-bottom: 2px;
+  }
+
+  .mode-btn-group {
+    display: flex;
+    gap: 4px;
+  }
+
+  .mode-btn {
+    flex: 1;
+    padding: 6px 8px;
+    background: transparent;
+    border: 1px solid var(--border-hover);
+    border-radius: 6px;
+    color: var(--text-dim);
+    font-size: 11px;
+    font-family: var(--font);
+    letter-spacing: 0;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .mode-btn:hover { border-color: var(--text-dim); color: var(--text); }
+  .mode-btn.active-analog {
+    background: rgba(81,84,240,0.15);
+    border-color: var(--accent-analog);
+    color: var(--accent-analog);
+  }
+  .mode-btn.active-digital {
+    background: rgba(79,168,158,0.15);
+    border-color: var(--accent-digital);
+    color: var(--accent-digital);
+  }
+  .mode-btn.active-split {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.3);
+    color: var(--text-bright);
+  }
+
+  #sidebar-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 14px 0;
+  }
+
+  #sidebar-scroll::-webkit-scrollbar { width: 3px; }
+  #sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+  #sidebar-scroll::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 2px; }
+
+  /* ── CONTROLS ── */
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 0 18px 8px;
+  }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 18px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .toggle-row:hover { background: var(--surface2); }
+  .toggle-row span { font-size: 12px; color: var(--text); }
+
+  .toggle {
+    position: relative;
+    width: 30px;
+    height: 17px;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute;
+    inset: 0;
+    background: var(--border-hover);
+    border-radius: 9px;
+    transition: background 0.2s;
+    cursor: pointer;
+  }
+  .toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 11px; height: 11px;
+    left: 3px; top: 3px;
+    background: var(--text-dim);
+    border-radius: 50%;
+    transition: transform 0.2s, background 0.2s;
+  }
+  .toggle input:checked + .toggle-slider { background: var(--accent); }
+  .toggle input:checked + .toggle-slider::before {
+    transform: translateX(13px);
+    background: #fff;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 10px 18px;
+  }
+
+  /* ── FILTER ACCORDION ── */
+  .filter-group { border-bottom: 1px solid var(--border); }
+
+  .filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 18px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .filter-header:hover { background: var(--surface2); }
+
+  .filter-header-name {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .filter-chevron {
+    width: 14px; height: 14px;
+    color: var(--text-dim);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+  .filter-group.open .filter-chevron { transform: rotate(180deg); }
+
+  .filter-active-count {
+    font-size: 10px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 8px;
+    padding: 1px 6px;
+    margin-right: 6px;
+    display: none;
+  }
+  .filter-active-count.visible { display: inline-block; }
+
+  .filter-options {
+    display: none;
+    flex-direction: column;
+    padding: 4px 0 10px;
+    background: rgba(0,0,0,0.12);
+  }
+  .filter-group.open .filter-options { display: flex; }
+
+  .filter-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 5px 18px;
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+  .filter-option:hover { background: var(--surface2); }
+
+  .filter-option input[type="checkbox"] {
+    appearance: none;
+    width: 13px; height: 13px;
+    border: 1px solid var(--border-hover);
+    border-radius: 3px;
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: background 0.15s, border-color 0.15s;
+    position: relative;
+  }
+  .filter-option input[type="checkbox"]:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .filter-option input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 3px; top: 1px;
+    width: 5px; height: 8px;
+    border: 1.5px solid #fff;
+    border-top: none; border-left: none;
+    transform: rotate(40deg);
+  }
+
+  .filter-option label {
+    font-size: 11px;
+    color: var(--text);
+    cursor: pointer;
+    line-height: 1.4;
+    letter-spacing: 0em;
+  }
+
+  #clear-filters {
+    margin: 12px 18px 4px;
+    padding: 7px 12px;
+    background: transparent;
+    border: 1px solid var(--border-hover);
+    border-radius: 6px;
+    color: var(--text-dim);
+    font-size: 11px;
+    font-family: var(--font);
+    letter-spacing: 0;
+    cursor: pointer;
+    width: calc(100% - 36px);
+    display: none;
+  }
+  #clear-filters:hover { border-color: var(--accent); color: var(--accent); }
+  #clear-filters.visible { display: block; }
+
+  /* ── MAP AREA ── */
+  #map-area {
+    flex: 1;
+    display: flex;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── SINGLE MAP PANE ── */
+  .map-pane {
+    position: relative;
+    overflow: hidden;
+    flex: 1;
+    cursor: grab;
+    transition: flex 0.3s ease;
+  }
+  .map-pane:active { cursor: grabbing; }
+
+  /* Split divider */
+  .split-divider {
+    width: 1px;
+    background: var(--border-hover);
+    flex-shrink: 0;
+    display: none;
+    position: relative;
+    z-index: 5;
+  }
+  body.mode-split .split-divider { display: block; }
+
+  /* Pane label badges */
+  .pane-label {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 10px;
+    border-radius: 12px;
+    z-index: 15;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  body.mode-split .pane-label { opacity: 1; }
+
+  #pane-analog .pane-label {
+    background: rgba(81,84,240,0.18);
+    border: 1px solid rgba(81,84,240,0.35);
+    color: #8b8ef5;
+  }
+  #pane-digital .pane-label {
+    background: rgba(79,168,158,0.18);
+    border: 1px solid rgba(79,168,158,0.35);
+    color: #6bbfb6;
+  }
+
+  /* Mode: single — hide the inactive pane */
+  body.mode-analog #pane-digital { display: none; }
+  body.mode-digital #pane-analog { display: none; }
+  body.mode-split #pane-analog,
+  body.mode-split #pane-digital { display: flex; flex-direction: column; }
+
+  .svg-wrapper {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+  .svg-wrapper svg {
+    width: 100%;
+    height: 100%;
+  }
+  .svg-wrapper g[id] {
+    transition: opacity 0.3s ease;
+  }
+
+  /* ── ZOOM CONTROLS ── */
+  .zoom-controls {
+    position: absolute;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 10;
+  }
+
+  .zoom-btn {
+    width: 32px; height: 32px;
+    background: var(--surface);
+    border: 1px solid var(--border-hover);
+    border-radius: 7px;
+    color: var(--text);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    font-family: var(--font);
+  }
+  .zoom-btn:hover { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
+
+  .reset-zoom-btn {
+    position: absolute;
+    top: 18px;
+    right: 24px;
+    padding: 6px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border-hover);
+    border-radius: 6px;
+    color: var(--text-dim);
+    font-size: 11px;
+    font-family: var(--font);
+    letter-spacing: 0;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.15s;
+  }
+  .reset-zoom-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── ACTIVE FILTER TAGS ── */
+  .active-tags {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    max-width: 60%;
+    z-index: 10;
+    pointer-events: none;
+  }
+  /* In split mode, push analog tags down to avoid overlap with label */
+  body.mode-split .active-tags { top: 42px; }
+
+  .active-tag {
+    background: var(--accent-soft);
+    border: 1px solid rgba(81,84,240,0.3);
+    color: var(--accent);
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    letter-spacing: 0;
+  }
+
+  /* ── INFO CARD ── */
+  .info-panel {
+    position: absolute;
+    bottom: 24px;
+    left: 18px;
+    width: 220px;
+    background: var(--surface);
+    border: 1px solid var(--border-hover);
+    border-radius: 8px;
+    padding: 10px 13px;
+    z-index: 20;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.18s, transform 0.18s;
+    pointer-events: none;
+  }
+  .info-panel.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .info-summary {
+    font-size: 11px;
+    color: var(--text);
+    line-height: 1.55;
+    letter-spacing: 0;
+  }
+
+  /* ── SIDEBAR COLLAPSE ── */
+  #sidebar-collapse {
+    position: absolute;
+    top: 14px;
+    left: 0;
+    width: 22px;
+    height: 40px;
+    background: var(--surface);
+    border: 1px solid var(--border-hover);
+    border-left: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  #sidebar-collapse:hover { background: var(--surface2); }
+  #sidebar-collapse svg {
+    width: 10px; height: 10px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+  #sidebar.collapsed { width: 0; min-width: 0; }
+  #sidebar.collapsed #sidebar-header,
+  #sidebar.collapsed #sidebar-scroll,
+  #sidebar.collapsed #mode-switcher { display: none; }
+
+  #sidebar-restore {
+    position: absolute;
+    top: 14px;
+    left: 0;
+    width: 22px;
+    height: 40px;
+    background: var(--surface);
+    border: 1px solid var(--border-hover);
+    border-left: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    z-index: 20;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  #sidebar-restore:hover { background: var(--surface2); }
+  #sidebar-restore svg {
+    width: 10px; height: 10px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+    transform: rotate(180deg);
+  }
+  body.sidebar-collapsed #sidebar-collapse { display: none; }
+  body.sidebar-collapsed #sidebar-restore { display: flex; }
+
+  #loading-analog, #loading-digital {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--text-dim);
+    font-size: 12px;
+    letter-spacing: 0;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body class="mode-analog">
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div id="sidebar-header">
+    <h1>Memory Map</h1>
+    <p>Pacific Northwest</p>
+  </div>
+
+  <div id="mode-switcher">
+    <div class="mode-label">View</div>
+    <div class="mode-btn-group">
+      <button class="mode-btn active-analog" data-mode="analog">Analog</button>
+      <button class="mode-btn" data-mode="digital">Digital</button>
+      <button class="mode-btn" data-mode="split">Split</button>
+    </div>
+  </div>
+
+  <div id="sidebar-scroll">
+    <div class="section-label" style="padding-top:14px">Layers</div>
+
+    <label class="toggle-row">
+      <span>Basemap</span>
+      <div class="toggle">
+        <input type="checkbox" id="basemap-toggle" checked>
+        <div class="toggle-slider"></div>
+      </div>
+    </label>
+
+    <label class="toggle-row">
+      <span>Show connections</span>
+      <div class="toggle">
+        <input type="checkbox" id="connections-toggle">
+        <div class="toggle-slider"></div>
+      </div>
+    </label>
+
+    <div class="divider"></div>
+    <div class="section-label">Filters</div>
+
+    <div id="filter-groups"></div>
+
+    <button id="clear-filters">Clear all filters</button>
+  </div>
+</div>
+
+<!-- MAP AREA -->
+<div id="map-area">
+
+  <!-- ANALOG PANE -->
+  <div class="map-pane" id="pane-analog">
+    <div class="pane-label">Analog</div>
+    <div class="svg-wrapper" id="svg-wrapper-analog">
+      <div id="loading-analog">Loading Analog map…</div>
+    </div>
+    <div class="active-tags" id="active-tags-analog"></div>
+    <button class="reset-zoom-btn" id="reset-zoom-analog">Reset view</button>
+    <div class="zoom-controls">
+      <button class="zoom-btn" id="zoom-in-analog">+</button>
+      <button class="zoom-btn" id="zoom-out-analog">−</button>
+    </div>
+    <div class="info-panel" id="info-panel-analog">
+      <div class="info-summary" id="info-summary-analog"></div>
+    </div>
+    <button id="sidebar-collapse" title="Collapse panel">
+      <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 2L3 5l3 3"/>
+      </svg>
+    </button>
+    <button id="sidebar-restore" title="Show panel">
+      <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 2L3 5l3 3"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="split-divider"></div>
+
+  <!-- DIGITAL PANE -->
+  <div class="map-pane" id="pane-digital">
+    <div class="pane-label">Digital</div>
+    <div class="svg-wrapper" id="svg-wrapper-digital">
+      <div id="loading-digital">Loading Digital map…</div>
+    </div>
+    <div class="active-tags" id="active-tags-digital"></div>
+    <button class="reset-zoom-btn" id="reset-zoom-digital">Reset view</button>
+    <div class="zoom-controls">
+      <button class="zoom-btn" id="zoom-in-digital">+</button>
+      <button class="zoom-btn" id="zoom-out-digital">−</button>
+    </div>
+    <div class="info-panel" id="info-panel-digital">
+      <div class="info-summary" id="info-summary-digital"></div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+
+// ── CSV DATA ───────────────────────────────────────────────────────────────
+const RAW_CSV = `orb_ID,place,summary,theme,time,memory type,year,area,residence,trigger,weather,connection,transformation
+analog_1,Coastline or beach,"Clamming on a cold PNW morning with family: salt, mud, sand, and salty air.",outdoor activity,Childhood (ages 0-12),Personal and specific to me,1978,Mixed/unsure,No,"people,places,food or drink,weather,music,smells",It triggers my memory,"My home,Specific people involved in the memory,A particular time in my life","No, it remains largely the same"
+analog_10,Coastline or beach,"Decades of coast trips with dogs, kids, wind, and a seal that became family legend.",family trip,Ongoing (this is a recurring or continuous experience),Shared between myself and specific others,1970,"Rural (countryside, farmland, small towns)",Yes,"smells,interactions and conversations,other",Weather or season plays no significant role,"My current self,My past self,My home,Specific people involved in the memory","No, it remains largely the same"
+analog_11,Coastline or beach,Cabin stays on the coasts with salt smoke clams and freezing ocean swims.,"nature itself,family trip",Adolescence (ages 13-18),Shared between myself and specific others,1970,Mixed/unsure,Yes,"people,places,physical objects,food or drink,weather,smells,interactions and conversations,textures",It enhances my emotional experience when recalling it,"My current self,My past self,My home,Specific people involved in the memory,A broader community,The place itself,A particular time in my life","Yes, it has changed significantly"
+analog_12,Forest,Growing up on a rural Oregon farm surrounded by forest and pasture.,nature itself,Childhood (ages 0-12),Personal and specific to me,1970,Mixed/unsure,Yes,"places,physical objects,textures",It enhances my emotional experience when recalling it,"My current self,My past self,The place itself,A particular time in my life","No, it remains largely the same"
+analog_13,Coastline or beach,Solo then shared: surfing and camping the north Oregon coast through the years.,outdoor activity,Ongoing (this is a recurring or continuous experience),"Shared by a collective group, culture, or community",1970,Suburban (residential areas outside city centers),Yes,"people,places,physical objects,food or drink,weather,smells,interactions and conversations",It is a primary aspect of the memory,"My current self,My past self,Specific people involved in the memory,The place itself,A particular time in my life","Yes, it has changed significantly"
+analog_14,Residential area,A forested childhood home with trails forts and mountain views out the window.,outdoor activity,Childhood (ages 0-12),Shared between myself and specific others,1969,Mixed/unsure,Yes,"people,places,physical objects,interactions and conversations,holidays",Weather or season plays no significant role,"My past self,Specific people involved in the memory,The place itself,A particular time in my life",Unsure
+analog_15,Coastline or beach,"Living on a lake with eagles, ospreys, otters, and trees.",nature itself,Ongoing (this is a recurring or continuous experience),"Shared by a collective group, culture, or community",1969,Suburban (residential areas outside city centers),Yes,"people,places,physical objects,weather,interactions and conversations,events,holidays","It is a primary aspect of the memory,It enhances my emotional experience when recalling it,Weather or season plays no significant role",The place itself,"No, it remains largely the same"
+analog_16,Forest,Douglas firs so big they felt eternal and the whole PNW smelled like Christmas.,nature itself,Ongoing (this is a recurring or continuous experience),Personal and specific to me,1968,"Rural (countryside, farmland, small towns)",No,"people,places,physical objects,food or drink,weather,smells,textures",It enhances my emotional experience when recalling it,"My current self,My past self,My home,A particular time in my life","No, it remains largely the same"
+analog_17,Coastline or beach,"Fishing, crabbing, and clamming in saltwater air with the sound of boat engines.",outdoor activity,Ongoing (this is a recurring or continuous experience),Unsure,1968,Suburban (residential areas outside city centers),Yes,"places,physical objects,food or drink,weather,smells",It triggers my memory,"My current self,My past self,Specific people involved in the memory,The place itself","No, it remains largely the same"
+analog_18,Residential area,"Christmas morning in the family house with the smell of turkey, presents, and the tree.",people,Childhood (ages 0-12),Shared between myself and specific others,1968,Suburban (residential areas outside city centers),Yes,"people,physical objects,food or drink,smells,holidays",It is a secondary aspect of the memory,"My past self,My home,A particular time in my life","No, it remains largely the same"
+analog_19,Residential area,Lake community life with Fourth of July pancakes and nighttime fireworks.,people,Ongoing (this is a recurring or continuous experience),"Shared by a collective group, culture, or community",1968,Suburban (residential areas outside city centers),Yes,"people,weather,smells,holidays","It is a primary aspect of the memory,It enhances my emotional experience when recalling it","My home,Specific people involved in the memory,A broader community","No, it remains largely the same"
+analog_2,Forest,"Hiking through forest then camping on the beach, making a fire, smell of smoke and waves.",outdoor activity,Young adulthood (ages 18-25),Personal and specific to me,1977,"Urban (city center, dense downtown area)",No,"places,smells",Weather or season plays no significant role,"My past self,The place itself,A particular time in my life",Unsure
+analog_20,Entertainment venue or arena,"Live shows at the tavern with music, beer, and dimly-lit streets.",people,Young adulthood (ages 18-25),"Shared by a collective group, culture, or community",1966,"Urban (city center, dense downtown area)",Yes,"people,places,weather,music,visual media,interactions and conversations",It is a primary aspect of the memory,"My past self,My home,Specific people involved in the memory,A broader community,The place itself,A particular time in my life","Yes, it no longer exists"
+analog_21,Residential area,"Driving to 7-Eleven with friends singing along to the radio, drinking icy cold Big Gulps.",people,Adolescence (ages 13-18),"Shared by a collective group, culture, or community",1966,Suburban (residential areas outside city centers),Yes,"places,food or drink,music",It is a secondary aspect of the memory,"My past self,A particular time in my life","No, it remains largely the same"
+analog_3,Coastline or beach,"Summer beach camping with family, neighborhood day trips with cold water, donuts, and sand.",family trip,Childhood (ages 0-12),Shared between myself and specific others,1974,"Rural (countryside, farmland, small towns)",Yes,"people,places,food or drink,weather,visual media,interactions and conversations,textures",It enhances my emotional experience when recalling it,"My past self,My home,Specific people involved in the memory,The place itself,A particular time in my life","No, it remains largely the same"
+analog_4,Coastline or beach,"Standing at the water, watching mountains in the sun.",nature itself,Ongoing (this is a recurring or continuous experience),Personal and specific to me,1973,"Rural (countryside, farmland, small towns)",Yes,"places,interactions and conversations,events,holidays","It is a secondary aspect of the memory,It enhances my emotional experience when recalling it,It triggers my memory","My past self,My home,The place itself,A particular time in my life","No, it remains largely the same"
+analog_5,Coastline or beach,"Full beach days with wind, the cannery smell, cold ocean, and napping, exhausted on the ride home.",family trip,Childhood (ages 0-12),Unsure,1973,Suburban (residential areas outside city centers),Yes,"people,places,food or drink,weather,smells",It is a secondary aspect of the memory,"My current self,My past self,Specific people involved in the memory,A broader community,The place itself","No, it remains largely the same"
+analog_6,Coastline or beach,A beach sunset with crashing waves and colors that feel primal and restorative to the soul.,nature itself,Ongoing (this is a recurring or continuous experience),Shared between myself and specific others,1973,Mixed/unsure,Yes,"people,places,weather",It enhances my emotional experience when recalling it,"My current self,Specific people involved in the memory,The place itself","No, it remains largely the same"
+analog_7,Residential area,Biking and walking the neighborhood with friends in warm sounds light and easy summer air.,"outdoor activity,people",Adolescence (ages 13-18),Shared between myself and specific others,1972,"Urban (city center, dense downtown area)",Yes,"people,places,music,interactions and conversations",It is a primary aspect of the memory,"My current self,My past self,Specific people involved in the memory,The place itself,A particular time in my life","No, it remains largely the same"
+analog_8,Residential area,"Buying a house that felt instantly like home, with tall firs, a cool breeze, and a park.",general,Young adulthood (ages 18-25),Personal and specific to me,1971,"Urban (city center, dense downtown area)",Yes,"places,weather",It is a primary aspect of the memory,"My current self,My past self,My home,A broader community,The place itself,A particular time in my life","No, it remains largely the same"
+analog_9,Coastline or beach,"Beach trip with family, eating fried fish in the rain, wearing flannels in the fog.",family trip,Ongoing (this is a recurring or continuous experience),Shared between myself and specific others,1970,Mixed/unsure,Yes,"places,food or drink,weather","It is a secondary aspect of the memory,It enhances my emotional experience when recalling it,It triggers my memory","My current self,The place itself","No, it remains largely the same"
+digital_1,Residential area,"Summer nights at the beach with bonfires, driftwood, and cold Pacific fog.",general,Ongoing (this is a recurring or continuous experience),Unsure,2002,Mixed/unsure,No,"places,physical objects,weather","It is a secondary aspect of the memory,It enhances my emotional experience when recalling it","My past self,A particular time in my life","Yes, it has changed significantly"
+digital_10,Forest,"Driving rural highways at night through dark wet forest, feeling completely alone.","people,outdoor activity",Childhood (ages 0-12),"Shared by a collective group, culture, or community",2001,Mixed/unsure,Yes,"places,visual media,smells,interactions and conversations,textures",Weather or season plays no significant role,"My current self,My past self,My home,Specific people involved in the memory,The place itself,A particular time in my life",Unsure
+digital_11,Mountain,"Hood River summers with fruit stands, wind, and the gorge stretching east forever.",outdoor activity,Adolescence (ages 13-18),Personal and specific to me,2001,Suburban (residential areas outside city centers),No,places,It is a secondary aspect of the memory,My past self,"No, it remains largely the same"
+digital_12,Forest,"Running trail systems in the forest through the mud, ferns, and always-present rain.","nature itself,outdoor activity ",Childhood (ages 0-12),Shared between myself and specific others,2000,Mixed/unsure,Yes,"people,places,weather,visual media,smells,textures,events",It enhances my emotional experience when recalling it,"My past self,My home,Specific people involved in the memory,The place itself,A particular time in my life","Yes, it has changed significantly"
+digital_13,Coastline or beach,"Backpacking along lakes, larches; silence above the tree line.",family trip,Childhood (ages 0-12),Shared between myself and specific others,2000,"Urban (city center, dense downtown area)",Yes,"people,places,physical objects",Weather or season plays no significant role,"My past self,My home,Specific people involved in the memory,The place itself,A particular time in my life","No, it remains largely the same"
+digital_14,Residential area,"Riding the ferry across the Puget Sound, watching the city recede into gray water.","outdoor activity,people",Childhood (ages 0-12),Personal and specific to me,2000,"Urban (city center, dense downtown area)",No,"people,places,physical objects",Weather or season plays no significant role,"My past self,My home,Specific people involved in the memory","No, it remains largely the same"
+digital_15,Coastline or beach,Winter storms on the Washington coast with massive spray.,"family trip,outdoor activity",Ongoing (this is a recurring or continuous experience),Shared between myself and specific others,2000,Mixed/unsure,Yes,"people,places,weather,visual media,smells",It is a secondary aspect of the memory,"My past self,My home,Specific people involved in the memory,The place itself,A particular time in my life","No, it remains largely the same"
+digital_16,Mountain,Farmers markets in Portland with fresh bread and flowers.,"family trip,outdoor activity",Adolescence (ages 13-18),"Shared by a collective group, culture, or community",1999,Suburban (residential areas outside city centers),Yes,"people,places,weather,smells,interactions and conversations,holidays",It is a secondary aspect of the memory,"My past self,Specific people involved in the memory,The place itself,A particular time in my life","No, it remains largely the same"
+digital_17,Coastline or beach,Mt. Hood at sunrise from Timberline Lodge with cold air and pink alpenglow on snow.,nature itself,Ongoing (this is a recurring or continuous experience),Shared between myself and specific others,1999,"Urban (city center, dense downtown area)",Yes,"people,places,food or drink,weather,visual media,smells,holidays",It is a primary aspect of the memory,"My current self,My past self,My home,A broader community,The place itself,A particular time in my life","No, it remains largely the same"
+digital_18,Mountain,Powder skiing on Mt. Hood after skipping class on a Spring day.,"outdoor activity,people",Adolescence (ages 13-18),Shared between myself and specific others,1998,"Rural (countryside, farmland, small towns)",No,"people,places,physical objects,weather,visual media,interactions and conversations,events",It is a primary aspect of the memory,"My past self,My home,The place itself,A particular time in my life","No, it remains largely the same"
+digital_19,Store/shop,A shop memory from adolescence in Washington felt mostly through music and mood.,general,Adolescence (ages 13-18),Shared between myself and specific others,1998,Suburban (residential areas outside city centers),Yes,music,It is a secondary aspect of the memory,My current self,"Yes, it has changed significantly"
+digital_2,Residential area,"Seattle summer nights: barefoot sidewalks, still-light sky, and a fan in the door.","outdoor activity,people",Childhood (ages 0-12),Shared between myself and specific others,2002,Mixed/unsure,No,"people,places,weather,smells,textures",It is a primary aspect of the memory,My home,"No, it remains largely the same"
+digital_20,Mountain,"Backpacking the North Cascades, the Olympics, and Rainier, mountains as home base.",outdoor activity,Young adulthood (ages 18-25),Shared between myself and specific others,1998,Mixed/unsure,No,"places,weather,events,holidays,other",Unsure,"My current self,My past self,My home,Specific people involved in the memory,A broader community,The place itself,A particular time in my life","No, it remains largely the same"
+digital_21,Entertainment venue or arena,Annual corn maze on Sauvie Island with the starry sky and muffled distant noise.,people,Ongoing (this is a recurring or continuous experience),Personal and specific to me,1997,"Urban (city center, dense downtown area)",Yes,"places,visual media,textures,holidays,other",It is a primary aspect of the memory,"My current self,My past self,My home,A particular time in my life","No, it remains largely the same"
+digital_22,Forest,"Forest trails at Mount Rainier with cold air, huge trees, and a feeling of home.",nature itself,Childhood (ages 0-12),"Shared by a collective group, culture, or community",1996,"Urban (city center, dense downtown area)",Yes,"places,weather,smells","It is a primary aspect of the memory,It is a secondary aspect of the memory,It enhances my emotional experience when recalling it","My current self,My past self,My home,A broader community,The place itself,A particular time in my life",Unsure
+digital_23,Coastline or beach,"Fourth of July on the water, a day of volleyball and the family together.",people,Childhood (ages 0-12),Shared between myself and specific others,1996,"Rural (countryside, farmland, small towns)",Yes,"places,food or drink,weather,events,holidays",It is a primary aspect of the memory,"My past self,The place itself,A particular time in my life","No, it remains largely the same"
+digital_24,Central/main street,"Portland neighborhoods during college, COVID lockdown built around restaurants and streets.",general,Young adulthood (ages 18-25),"Shared by a collective group, culture, or community",1995,Mixed/unsure,No,"people,places,food or drink,weather,music,visual media,interactions and conversations,events",It is a secondary aspect of the memory,"My past self,Specific people involved in the memory,A broader community,The place itself,A particular time in my life","No, it remains largely the same"
+digital_25,Coastline or beach,"Thanksgiving on the Oregon coast with rain, wind, and sand stinging bare ankles.",nature itself,Childhood (ages 0-12),"Shared by a collective group, culture, or community",1994,Mixed/unsure,No,"smells,other",It triggers my memory,"My home,The place itself","No, it remains largely the same"
+digital_26,Central/main street,"Walking to a bakery with dad on weekends for donuts, milk, and small-town windows.",people,Childhood (ages 0-12),Shared between myself and specific others,1991,Mixed/unsure,Yes,"places,food or drink,weather,visual media,smells,textures","It is a secondary aspect of the memory,It enhances my emotional experience when recalling it",A particular time in my life,Unsure
+digital_3,Forest,"Walks through Pacific Northwest forest finding ferns, snails, berries, and hearing birdsong.","nature itself,outdoor activity ",Ongoing (this is a recurring or continuous experience),"Shared by a collective group, culture, or community",2002,Mixed/unsure,Yes,"places,physical objects,weather,smells,textures","It is a secondary aspect of the memory,It enhances my emotional experience when recalling it,It triggers my memory","My current self,My past self,My home,The place itself","Yes, it has changed significantly"
+digital_4,Coastline or beach,Drives through thickening forest and fog to visit grandparents on coast.,family trip,Childhood (ages 0-12),Shared between myself and specific others,2002,Mixed/unsure,Yes,"places,weather,smells,holidays","It is a secondary aspect of the memory,It enhances my emotional experience when recalling it","My past self,Specific people involved in the memory,The place itself,A particular time in my life","No, it remains largely the same"
+digital_5,Mountain,"Yearly Sunriver winter trips with sledding in fresh snow, quiet and cold with bright white light.","family trip,outdoor activity",Childhood (ages 0-12),Shared between myself and specific others,2001,"Urban (city center, dense downtown area)",No,"people,places,weather","It is a primary aspect of the memory,It enhances my emotional experience when recalling it,It triggers my memory","My past self,My home,Specific people involved in the memory",Unsure
+digital_6,Coastline or beach,A coastline memory from adolescence in Washington with sparse detail left behind.,general,Adolescence (ages 13-18),,2001,"Urban (city center, dense downtown area)",Yes,,,,
+digital_8,Mountain,Overnight at a fire lookout with friends watching sunrise in cold mountain silence.,"people,outdoor activity",Adolescence (ages 13-18),Shared between myself and specific others,2001,Suburban (residential areas outside city centers),No,"people,places,weather,interactions and conversations","It is a primary aspect of the memory,It is a secondary aspect of the memory","My past self,My home,Specific people involved in the memory,The place itself","No, it remains largely the same"
+digital_9,Forest,A snow-bent fir branch became a winter shelter for siblings in cold dark green woods.,"people,outdoor activity",Childhood (ages 0-12),Shared between myself and specific others,2001,"Rural (countryside, farmland, small towns)",Yes,"weather,interactions and conversations",It is a primary aspect of the memory,"My home,The place itself,A particular time in my life",Unsure`;
+
+// ── FILTER DEFINITIONS ─────────────────────────────────────────────────────
+const FILTERS = [
+  { key: 'theme',          label: 'Memory content',      options: ['general','people','nature itself','outdoor activity','family trip'] },
+  { key: 'time',           label: 'Life stage',          options: ['Young adulthood (ages 18-25)','Childhood (ages 0-12)','Ongoing (this is a recurring or continuous experience)','Adolescence (ages 13-18)'] },
+  { key: 'memory type',    label: 'Memory type',         options: ['Shared by a collective group, culture, or community','Shared between myself and specific others','Unsure','Personal and specific to me'] },
+  { key: 'area',           label: 'Area of residence',   options: ['Mixed/unsure','Suburban (residential areas outside city centers)','Rural (countryside, farmland, small towns)','Urban (city center, dense downtown area)'] },
+  { key: 'residence',      label: 'Current resident',    options: ['No','Yes'] },
+  { key: 'trigger',        label: 'Triggers',            options: ['people','places','physical objects','food or drink','weather','music','visual media','smells','interactions and conversations','textures','events','holidays','other'] },
+  { key: 'connection',     label: 'Sense of connection', options: ['My current self','My past self','My home','Specific people involved in the memory','A broader community','The place itself','A particular time in my life','Other'] },
+  { key: 'transformation', label: 'Place transformation',options: ['No, it remains largely the same','Unsure','Yes, it has changed significantly','Yes, it no longer exists'] },
+  { key: 'weather',        label: 'Role of weather',     options: ['It is a primary aspect of the memory','It is a secondary aspect of the memory','It enhances my emotional experience when recalling it','It triggers my memory','Weather or season plays no significant role','Unsure'] },
+];
+
+// ── OVERLAY MAPS ────────────────────────────────────────────────────────────
+const ANALOG_OVERLAY_MAP = {
+  'Shared by a collective group, culture, or community': 'analog_community',
+  'Shared between myself and specific others':           'analog_shared',
+  'Personal and specific to me':                        'analog_personal',
+  'Unsure':                                             'analog_mixed',
+};
+const DIGITAL_OVERLAY_MAP = {
+  'Shared by a collective group, culture, or community': 'digital_community',
+  'Shared between myself and specific others':           'digital_shared',
+  'Personal and specific to me':                        'digital_personal',
+  'Unsure':                                             'digital_mixed',
+};
+const ANALOG_HIDDEN_OVERLAYS  = ['analog_community','analog_shared','analog_personal','analog_mixed'];
+const DIGITAL_HIDDEN_OVERLAYS = ['digital_community','digital_shared','digital_personal','digital_mixed'];
+
+// ── SHARED STATE ──────────────────────────────────────────────────────────
+const activeFilters = {};
+let currentMode = 'analog'; // 'analog' | 'digital' | 'split'
+
+// ── CSV PARSE ──────────────────────────────────────────────────────────────
+function parseCSV(raw) {
+  const lines = raw.trim().split('\n');
+  const headers = lines[0].split(',');
+  return lines.slice(1).map(line => {
+    const vals = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') { inQ = !inQ; }
+      else if (c === ',' && !inQ) { vals.push(cur.trim()); cur = ''; }
+      else { cur += c; }
+    }
+    vals.push(cur.trim());
+    const obj = {};
+    headers.forEach((h, i) => { obj[h.trim()] = (vals[i] || '').replace(/^"|"$/g, ''); });
+    return obj;
+  });
+}
+
+const data = parseCSV(RAW_CSV);
+const byId = {};
+data.forEach(d => { byId[d.orb_ID.trim()] = d; });
+
+function valuesFor(row, key) {
+  if (!row) return [];
+  return (row[key] || '').split(',').map(s => s.trim()).filter(Boolean);
+}
+
+// ── PER-MAP STATE ─────────────────────────────────────────────────────────
+function createMapController(prefix) {
+  const isAnalog = prefix === 'analog';
+  const OVERLAY_MAP     = isAnalog ? ANALOG_OVERLAY_MAP    : DIGITAL_OVERLAY_MAP;
+  const HIDDEN_OVERLAYS = isAnalog ? ANALOG_HIDDEN_OVERLAYS : DIGITAL_HIDDEN_OVERLAYS;
+
+  // Suffix-swap helper: 'analog_community' ↔ 'digital_community'
+  function peerOverlayId(id) {
+    return id.startsWith('analog_')
+      ? id.replace('analog_', 'digital_')
+      : id.replace('digital_', 'analog_');
+  }
+
+  const state = {
+    orbs: [],
+    activeNode: null,
+    zoom: null,
+    svgD3: null,
+    _syncing: false, // prevents zoom echo-loop
+  };
+
+  let _peer = null; // set after both controllers are created
+
+  const $ = id => document.getElementById(id);
+  const wrapper     = $(`svg-wrapper-${prefix}`);
+  const infoPanel   = $(`info-panel-${prefix}`);
+  const infoSummary = $(`info-summary-${prefix}`);
+
+  function getSvgEl()      { return wrapper ? wrapper.querySelector('svg') : null; }
+  function getLayerEl(id)  { const s = getSvgEl(); return s ? s.getElementById(id) : null; }
+
+  function setOverlay(name, visible) {
+    const el = getLayerEl(name);
+    if (el) el.style.display = visible ? '' : 'none';
+  }
+  function hideAllOverlays() {
+    HIDDEN_OVERLAYS.forEach(id => setOverlay(id, false));
+  }
+
+  function orbMatchesFilters(orbId) {
+    const row = byId[orbId];
+    if (!row) return true;
+    for (const [key, vals] of Object.entries(activeFilters)) {
+      if (vals.size === 0) continue;
+      const orbVals = valuesFor(row, key);
+      if (![...vals].some(v => orbVals.includes(v))) return false;
+    }
+    return true;
+  }
+
+  function applyState() {
+    if (state.activeNode) return;
+    const hasFilters = Object.keys(activeFilters).length > 0;
+    state.orbs.forEach(orbId => {
+      const el = getLayerEl(orbId);
+      if (!el) return;
+      el.style.opacity = (!hasFilters || orbMatchesFilters(orbId)) ? '' : '0.2';
+    });
+  }
+
+  function showInfo(orbId, row) {
+    if (!row) return;
+    infoSummary.textContent = row.summary || row.place || '—';
+    infoPanel.classList.add('visible');
+  }
+
+  function selectNode(orbId) {
+    clearNodeSelection(false);
+    state.activeNode = orbId;
+    const el = getLayerEl(orbId);
+    if (el) {
+      el.style.transform = 'scale(1.1)';
+      el.style.filter = 'drop-shadow(0 0 6px rgba(255,255,255,0.55)) drop-shadow(0 0 12px rgba(255,255,255,0.25))';
+    }
+    hideAllOverlays();
+    state.orbs.forEach(id => {
+      if (id === orbId) return;
+      const nodeEl = getLayerEl(id);
+      if (nodeEl) nodeEl.style.opacity = '0.2';
+    });
+    showInfo(orbId, byId[orbId]);
+  }
+
+  function clearNodeSelection(doApply = true) {
+    if (state.activeNode) {
+      const prev = getLayerEl(state.activeNode);
+      if (prev) { prev.style.transform = ''; prev.style.filter = ''; }
+      state.activeNode = null;
+    }
+    hideAllOverlays();
+    state.orbs.forEach(id => {
+      const el = getLayerEl(id);
+      if (el) { el.style.opacity = ''; el.style.filter = ''; }
+    });
+    infoPanel.classList.remove('visible');
+    if (doApply) applyState();
+  }
+
+  // ── PUBLIC: highlight a memory-type group (called directly or by peer sync) ──
+  function highlightMemType(memType) {
+    if (state.activeNode) return;
+    hideAllOverlays();
+    const overlayId = OVERLAY_MAP[memType];
+    if (overlayId) setOverlay(overlayId, true);
+    state.orbs.forEach(id => {
+      const r = byId[id];
+      const mt = r ? (r['memory type'] || '').trim() : '';
+      const nodeEl = getLayerEl(id);
+      if (nodeEl) nodeEl.style.opacity = mt === memType ? '' : '0.2';
+    });
+  }
+
+  // ── PUBLIC: clear hover highlight (called directly or by peer sync) ──
+  function clearHighlight() {
+    if (state.activeNode) return;
+    hideAllOverlays();
+    state.orbs.forEach(id => {
+      const nodeEl = getLayerEl(id);
+      if (nodeEl) nodeEl.style.opacity = '';
+    });
+    applyState();
+  }
+
+  function setupNodeInteractions() {
+    state.orbs.forEach(orbId => {
+      const el = getLayerEl(orbId);
+      if (!el) return;
+      el.style.cursor = 'pointer';
+      el.style.transformOrigin = 'center';
+      el.style.transformBox = 'fill-box';
+
+      el.addEventListener('mouseenter', () => {
+        if (state.activeNode) return;
+        const row = byId[orbId];
+        const memType = row ? (row['memory type'] || '').trim() : '';
+        highlightMemType(memType);
+        // Sync peer in split mode
+        if (currentMode === 'split' && _peer) _peer.highlightMemType(memType);
+      });
+
+      el.addEventListener('mouseleave', () => {
+        if (state.activeNode) return;
+        clearHighlight();
+        // Sync peer in split mode
+        if (currentMode === 'split' && _peer) _peer.clearHighlight();
+      });
+
+      el.addEventListener('click', e => {
+        e.stopPropagation();
+        state.activeNode === orbId ? clearNodeSelection() : selectNode(orbId);
+      });
+    });
+
+    // Quotes layer hover
+    const svgEl = getSvgEl();
+    if (svgEl) {
+      const quotesLayer = svgEl.getElementById(`${prefix}_quotes`);
+      if (quotesLayer) {
+        quotesLayer.querySelectorAll('*').forEach(el => {
+          el.addEventListener('mouseenter', () => {
+            el.setAttribute('data-orig-fill', el.getAttribute('fill') || '');
+            el.setAttribute('fill', '#9AC993');
+            el.style.cursor = 'default';
+          });
+          el.addEventListener('mouseleave', () => {
+            const orig = el.getAttribute('data-orig-fill');
+            if (orig) el.setAttribute('fill', orig);
+            else el.removeAttribute('fill');
+          });
+        });
+      }
+    }
+
+    // Click on pane background → clear selection
+    wrapper.addEventListener('click', () => clearNodeSelection());
+  }
+
+  function initZoom(svgEl) {
+    const SVG_W = 3640, SVG_H = 2600;
+
+    const zoomGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    zoomGroup.id = `zoom-layer-${prefix}`;
+    while (svgEl.firstChild) zoomGroup.appendChild(svgEl.firstChild);
+    svgEl.appendChild(zoomGroup);
+
+    function computeMinScale() {
+      const cW = svgEl.clientWidth  || svgEl.parentElement.clientWidth;
+      const cH = svgEl.clientHeight || svgEl.parentElement.clientHeight;
+      const fitK   = Math.min(cW / SVG_W, cH / SVG_H);
+      const coverK = Math.max(cW / SVG_W, cH / SVG_H);
+      return coverK / fitK;
+    }
+
+    const zoom = d3.zoom()
+      .scaleExtent([computeMinScale(), 50])
+      .translateExtent([[0, 0], [SVG_W, SVG_H]])
+      .on('zoom', event => {
+        zoomGroup.setAttribute('transform', event.transform);
+        // Mirror zoom to peer when in split mode, guard against echo
+        if (currentMode === 'split' && _peer && !state._syncing) {
+          const peerState = _peer.getState();
+          if (peerState.svgD3 && peerState.zoom && !peerState._syncing) {
+            peerState._syncing = true;
+            peerState.svgD3.call(peerState.zoom.transform, event.transform);
+            peerState._syncing = false;
+          }
+        }
+      });
+
+    const svgD3 = d3.select(svgEl);
+    svgD3.call(zoom);
+    svgD3.on('dblclick.zoom', null);
+
+    state.zoom  = zoom;
+    state.svgD3 = svgD3;
+
+    $(`zoom-in-${prefix}`).addEventListener('click', () => {
+      svgD3.transition().duration(250).call(zoom.scaleBy, 1.5);
+    });
+    $(`zoom-out-${prefix}`).addEventListener('click', () => {
+      svgD3.transition().duration(250).call(zoom.scaleBy, 0.67);
+    });
+    $(`reset-zoom-${prefix}`).addEventListener('click', () => {
+      svgD3.transition().duration(350).call(zoom.transform, d3.zoomIdentity);
+    });
+  }
+
+  function loadSVG() {
+    fetch(`${prefix.toUpperCase()}.svg`)
+      .then(r => {
+        if (!r.ok) throw new Error(`Could not load ${prefix.toUpperCase()}.svg (HTTP ${r.status})`);
+        return r.text();
+      })
+      .then(svgText => {
+        wrapper.innerHTML = svgText;
+        const svgEl = wrapper.querySelector('svg');
+        if (!svgEl) throw new Error(`No <svg> element found in ${prefix.toUpperCase()}.svg`);
+        svgEl.style.width  = '100%';
+        svgEl.style.height = '100%';
+
+        HIDDEN_OVERLAYS.forEach(id => setOverlay(id, false));
+
+        state.orbs = data
+          .map(d => d.orb_ID.trim())
+          .filter(id => id.startsWith(`${prefix}_`) && svgEl.getElementById(id));
+
+        initZoom(svgEl);
+        setupNodeInteractions();
+      })
+      .catch(err => {
+        wrapper.innerHTML = `
+          <div id="loading-${prefix}" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:rgba(212,207,200,0.45);font-size:12px;pointer-events:none;">
+            <span style="color:#E24B4A;font-size:13px">Failed to load ${prefix.toUpperCase()}.svg</span>
+            <span style="font-size:11px;opacity:0.5">${err.message}</span>
+            <span style="font-size:11px;opacity:0.35;text-align:center;max-width:320px">
+              Make sure ${prefix.toUpperCase()}.svg is in the same folder and you're running<br>
+              a local server: <code>python3 -m http.server 8000</code>
+            </span>
+          </div>`;
+      });
+  }
+
+  // Public API
+  return {
+    load: loadSVG,
+    applyState,
+    clearNodeSelection,
+    hideAllOverlays,
+    setOverlay,
+    highlightMemType,
+    clearHighlight,
+    HIDDEN_OVERLAYS,
+    getState: () => state,
+    setPeer: (peer) => { _peer = peer; },
+  };
+}
+
+// ── INSTANTIATE MAPS ───────────────────────────────────────────────────────
+const analogMap  = createMapController('analog');
+const digitalMap = createMapController('digital');
+
+// Wire up peer references for split-mode sync
+analogMap.setPeer(digitalMap);
+digitalMap.setPeer(analogMap);
+
+analogMap.load();
+digitalMap.load();
+
+// ── MODE SWITCHER ─────────────────────────────────────────────────────────
+const modeBtns = document.querySelectorAll('.mode-btn');
+
+function setMode(mode) {
+  currentMode = mode;
+  document.body.className = document.body.className
+    .replace(/\bmode-\S+/g, '')
+    .trim();
+  document.body.classList.add(`mode-${mode}`);
+  if (document.body.classList.contains('sidebar-collapsed'))
+    document.body.classList.add('sidebar-collapsed');
+
+  modeBtns.forEach(btn => {
+    btn.classList.remove('active-analog','active-digital','active-split');
+    if (btn.dataset.mode === mode) {
+      if (mode === 'analog')  btn.classList.add('active-analog');
+      if (mode === 'digital') btn.classList.add('active-digital');
+      if (mode === 'split')   btn.classList.add('active-split');
+    }
+  });
+
+  // Update sidebar title
+  const h1 = document.querySelector('#sidebar-header h1');
+  if (mode === 'analog')  h1.textContent = 'Analog Memory';
+  if (mode === 'digital') h1.textContent = 'Digital Memory';
+  if (mode === 'split')   h1.textContent = 'Memory Map';
+
+  // Re-sync basemap/connections toggles to both maps after layout change
+  syncBasemap();
+  syncConnections();
+}
+
+modeBtns.forEach(btn => {
+  btn.addEventListener('click', () => setMode(btn.dataset.mode));
+});
+
+// ── BASEMAP + QUOTES TOGGLE ────────────────────────────────────────────────
+function syncBasemap() {
+  const vis = document.getElementById('basemap-toggle').checked ? '' : '0';
+  ['analog','digital'].forEach(prefix => {
+    const svgEl = document.querySelector(`#svg-wrapper-${prefix} svg`);
+    if (!svgEl) return;
+    const bm = svgEl.getElementById(`${prefix}_basemap`);
+    const qt = svgEl.getElementById(`${prefix}_quotes`);
+    if (bm) bm.style.opacity = vis;
+    if (qt) qt.style.opacity = vis;
+  });
+}
+
+function syncConnections() {
+  const on = document.getElementById('connections-toggle').checked;
+  [
+    { map: analogMap,  overlays: ANALOG_HIDDEN_OVERLAYS  },
+    { map: digitalMap, overlays: DIGITAL_HIDDEN_OVERLAYS },
+  ].forEach(({ map, overlays }) => {
+    if (on) overlays.forEach(id => map.setOverlay(id, true));
+    else    map.hideAllOverlays();
+  });
+}
+
+document.getElementById('basemap-toggle').addEventListener('change', syncBasemap);
+document.getElementById('connections-toggle').addEventListener('change', syncConnections);
+
+// ── FILTER UI ─────────────────────────────────────────────────────────────
+const filterContainer = document.getElementById('filter-groups');
+
+FILTERS.forEach(f => {
+  const group = document.createElement('div');
+  group.className = 'filter-group';
+
+  const countId = `count-${f.key.replace(/\s/g, '_')}`;
+  const header = document.createElement('div');
+  header.className = 'filter-header';
+  header.innerHTML = `
+    <span class="filter-header-name">${f.label}</span>
+    <span class="filter-active-count" id="${countId}">0</span>
+    <svg class="filter-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M4 6l4 4 4-4"/>
+    </svg>`;
+  header.addEventListener('click', () => group.classList.toggle('open'));
+
+  const opts = document.createElement('div');
+  opts.className = 'filter-options';
+
+  f.options.forEach(opt => {
+    const row = document.createElement('label');
+    row.className = 'filter-option';
+    const cbId = `chk-${f.key.replace(/\s/g, '_')}-${opt.replace(/\W/g, '_')}`;
+    row.innerHTML = `<input type="checkbox" id="${cbId}" data-key="${f.key}" data-val="${opt}"><label for="${cbId}">${opt}</label>`;
+    row.querySelector('input').addEventListener('change', onFilterChange);
+    opts.appendChild(row);
+  });
+
+  group.appendChild(header);
+  group.appendChild(opts);
+  filterContainer.appendChild(group);
+});
+
+function onFilterChange(e) {
+  const { key, val } = e.target.dataset;
+  if (!activeFilters[key]) activeFilters[key] = new Set();
+  if (e.target.checked) activeFilters[key].add(val);
+  else activeFilters[key].delete(val);
+  if (activeFilters[key].size === 0) delete activeFilters[key];
+  updateFilterUI();
+  analogMap.applyState();
+  digitalMap.applyState();
+}
+
+function updateFilterUI() {
+  const hasAny = Object.keys(activeFilters).length > 0;
+  document.getElementById('clear-filters').classList.toggle('visible', hasAny);
+
+  FILTERS.forEach(f => {
+    const el = document.getElementById(`count-${f.key.replace(/\s/g, '_')}`);
+    if (!el) return;
+    const count = activeFilters[f.key] ? activeFilters[f.key].size : 0;
+    el.textContent = count;
+    el.classList.toggle('visible', count > 0);
+  });
+
+  // Update active tags on both panes
+  ['analog','digital'].forEach(prefix => {
+    const tagsEl = document.getElementById(`active-tags-${prefix}`);
+    if (!tagsEl) return;
+    tagsEl.innerHTML = '';
+    Object.entries(activeFilters).forEach(([, vals]) => {
+      vals.forEach(v => {
+        const tag = document.createElement('span');
+        tag.className = 'active-tag';
+        tag.textContent = v.length > 28 ? v.slice(0, 26) + '…' : v;
+        tagsEl.appendChild(tag);
+      });
+    });
+  });
+}
+
+document.getElementById('clear-filters').addEventListener('click', () => {
+  document.querySelectorAll('.filter-option input[type="checkbox"]').forEach(c => c.checked = false);
+  Object.keys(activeFilters).forEach(k => delete activeFilters[k]);
+  updateFilterUI();
+  analogMap.applyState();
+  digitalMap.applyState();
+});
+
+// ── SIDEBAR COLLAPSE ───────────────────────────────────────────────────────
+document.getElementById('sidebar-collapse').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.add('collapsed');
+  document.body.classList.add('sidebar-collapsed');
+});
+document.getElementById('sidebar-restore').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.remove('collapsed');
+  document.body.classList.remove('sidebar-collapsed');
+});
+
+</script>
+</body>
+</html>

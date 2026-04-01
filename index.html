@@ -25,7 +25,10 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    background: var(--bg);
+    background-color: var(--bg);
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJBTkFMT0ciIGNsaXAtcGF0aD0idXJsKCNjbGlwMF8zMTlfODU5KSI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjM0Y0NjUyIi8+CjxnIGlkPSJhbmFsb2dfbm9pc2UiPgo8ZyBpZD0iUmVjdGFuZ2xlIDEwOSIgb3BhY2l0eT0iMC41IiBmaWx0ZXI9InVybCgjZmlsdGVyMF9uXzMxOV84NTkpIj4KPHBhdGggZD0iTTAgMEgzNjQwVjI2MDBIMFYwWiIgZmlsbD0iIzE5MjEyRSIvPgo8L2c+CjwvZz4KPC9nPgo8ZGVmcz4KPGZpbHRlciBpZD0iZmlsdGVyMF9uXzMxOV84NTkiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNjQwIiBoZWlnaHQ9IjI2MDAiIGZpbHRlclVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgY29sb3ItaW50ZXJwb2xhdGlvbi1maWx0ZXJzPSJzUkdCIj4KPGZlRmxvb2QgZmxvb2Qtb3BhY2l0eT0iMCIgcmVzdWx0PSJCYWNrZ3JvdW5kSW1hZ2VGaXgiLz4KPGZlQmxlbmQgbW9kZT0ibm9ybWFsIiBpbj0iU291cmNlR3JhcGhpYyIgaW4yPSJCYWNrZ3JvdW5kSW1hZ2VGaXgiIHJlc3VsdD0ic2hhcGUiLz4KPGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjIgMiIgc3RpdGNoVGlsZXM9InN0aXRjaCIgbnVtT2N0YXZlcz0iMyIgcmVzdWx0PSJub2lzZSIgc2VlZD0iODUyOSIgLz4KPGZlQ29sb3JNYXRyaXggaW49Im5vaXNlIiB0eXBlPSJsdW1pbmFuY2VUb0FscGhhIiByZXN1bHQ9ImFscGhhTm9pc2UiIC8+CjxmZUNvbXBvbmVudFRyYW5zZmVyIGluPSJhbHBoYU5vaXNlIiByZXN1bHQ9ImNvbG9yZWROb2lzZTEiPgo8ZmVGdW5jQSB0eXBlPSJkaXNjcmV0ZSIgdGFibGVWYWx1ZXM9IjEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgIi8+CjwvZmVDb21wb25lbnRUcmFuc2Zlcj4KPGZlQ29tcG9zaXRlIG9wZXJhdG9yPSJpbiIgaW4yPSJzaGFwZSIgaW49ImNvbG9yZWROb2lzZTEiIHJlc3VsdD0ibm9pc2UxQ2xpcHBlZCIgLz4KPGZlQ29tcG9uZW50VHJhbnNmZXIgaW49ImFscGhhTm9pc2UiIHJlc3VsdD0iY29sb3JlZE5vaXNlMiI+CjxmZUZ1bmNBIHR5cGU9ImRpc2NyZXRlIiB0YWJsZVZhbHVlcz0iMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAiLz4KPC9mZUNvbXBvbmVudFRyYW5zZmVyPgo8ZmVDb21wb3NpdGUgb3BlcmF0b3I9ImluIiBpbjI9InNoYXBlIiBpbj0iY29sb3JlZE5vaXNlMiIgcmVzdWx0PSJub2lzZTJDbGlwcGVkIiAvPgo8ZmVGbG9vZCBmbG9vZC1jb2xvcj0icmdiYSgyNSwgMzMsIDQ2LCAwLjI1KSIgcmVzdWx0PSJjb2xvcjFGbG9vZCIgLz4KPGZlQ29tcG9zaXRlIG9wZXJhdG9yPSJpbiIgaW4yPSJub2lzZTFDbGlwcGVkIiBpbj0iY29sb3IxRmxvb2QiIHJlc3VsdD0iY29sb3IxIiAvPgo8ZmVGbG9vZCBmbG9vZC1jb2xvcj0icmdiYSgyNTUsIDI1NSwgMjU1LCAwLjI1KSIgcmVzdWx0PSJjb2xvcjJGbG9vZCIgLz4KPGZlQ29tcG9zaXRlIG9wZXJhdG9yPSJpbiIgaW4yPSJub2lzZTJDbGlwcGVkIiBpbj0iY29sb3IyRmxvb2QiIHJlc3VsdD0iY29sb3IyIiAvPgo8ZmVNZXJnZSByZXN1bHQ9ImVmZmVjdDFfbm9pc2VfMzE5Xzg1OSI+CjxmZU1lcmdlTm9kZSBpbj0ic2hhcGUiIC8+CjxmZU1lcmdlTm9kZSBpbj0iY29sb3IxIiAvPgo8ZmVNZXJnZU5vZGUgaW49ImNvbG9yMiIgLz4KPC9mZU1lcmdlPgo8L2ZpbHRlcj4KPGNsaXBQYXRoIGlkPSJjbGlwMF8zMTlfODU5Ij4KPHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IndoaXRlIi8+CjwvY2xpcFBhdGg+CjwvZGVmcz4KPC9zdmc+Cg==");
+    background-repeat: repeat;
+    background-size: 200px 200px;
     color: var(--text);
     font-family: var(--font);
     font-size: 13px;
@@ -95,31 +98,25 @@
     flex: 1;
     padding: 6px 8px;
     background: transparent;
-    border: 1px solid var(--border-hover);
+    border: 1px solid var(--accent);
     border-radius: 6px;
-    color: var(--text-dim);
+    color: var(--accent);
     font-size: 11px;
     font-family: var(--font);
     letter-spacing: 0;
     cursor: pointer;
     transition: all 0.15s;
     text-align: center;
+    opacity: 0.45;
   }
-  .mode-btn:hover { border-color: var(--text-dim); color: var(--text); }
-  .mode-btn.active-analog {
-    background: rgba(81,84,240,0.15);
-    border-color: var(--accent-analog);
-    color: var(--accent-analog);
-  }
-  .mode-btn.active-digital {
-    background: rgba(79,168,158,0.15);
-    border-color: var(--accent-digital);
-    color: var(--accent-digital);
-  }
+  .mode-btn:hover { opacity: 0.75; }
+  .mode-btn.active-analog,
+  .mode-btn.active-digital,
   .mode-btn.active-split {
-    background: rgba(255,255,255,0.06);
-    border-color: rgba(255,255,255,0.3);
-    color: var(--text-bright);
+    background: rgba(81,84,240,0.15);
+    border-color: var(--accent);
+    color: var(--accent);
+    opacity: 1;
   }
 
   #sidebar-scroll {
@@ -430,7 +427,11 @@
     align-items: center;
   }
   .reset-zoom-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .node-builder-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .node-builder-btn {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .node-builder-btn:hover { background: rgba(81,84,240,0.12); }
 
   /* ── ACTIVE FILTER TAGS ── */
   .active-tags {
@@ -493,11 +494,11 @@
     width: 22px;
     height: 40px;
     background: var(--surface);
-    border: 1px solid var(--border-hover);
+    border: 1px solid var(--accent);
     border-left: none;
     border-radius: 0 5px 5px 0;
     cursor: pointer;
-    z-index: 20;
+    z-index: 40;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -506,7 +507,7 @@
   #sidebar-collapse:hover { background: var(--surface2); }
   #sidebar-collapse svg {
     width: 10px; height: 10px;
-    color: var(--text-dim);
+    color: var(--accent);
     flex-shrink: 0;
   }
   #sidebar.collapsed { width: 0; min-width: 0; }
@@ -521,11 +522,11 @@
     width: 22px;
     height: 40px;
     background: var(--surface);
-    border: 1px solid var(--border-hover);
+    border: 1px solid var(--accent);
     border-left: none;
     border-radius: 0 5px 5px 0;
     cursor: pointer;
-    z-index: 20;
+    z-index: 40;
     display: none;
     align-items: center;
     justify-content: center;
@@ -534,7 +535,7 @@
   #sidebar-restore:hover { background: var(--surface2); }
   #sidebar-restore svg {
     width: 10px; height: 10px;
-    color: var(--text-dim);
+    color: var(--accent);
     flex-shrink: 0;
     transform: rotate(180deg);
   }
@@ -556,7 +557,7 @@
   }
 </style>
 </head>
-<body class="mode-analog">
+<body class="mode-split">
 
 <!-- SIDEBAR -->
 <div id="sidebar">
@@ -568,9 +569,9 @@
   <div id="mode-switcher">
     <div class="mode-label">View</div>
     <div class="mode-btn-group">
-      <button class="mode-btn active-analog" data-mode="analog">Analog</button>
+      <button class="mode-btn" data-mode="analog">Analog</button>
       <button class="mode-btn" data-mode="digital">Digital</button>
-      <button class="mode-btn" data-mode="split">Split</button>
+      <button class="mode-btn active-split" data-mode="split">Split</button>
     </div>
   </div>
 
@@ -605,6 +606,18 @@
 <!-- MAP AREA -->
 <div id="map-area">
 
+  <!-- Sidebar collapse/restore — lives here so it's always visible regardless of mode -->
+  <button id="sidebar-collapse" title="Collapse panel">
+    <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 2L3 5l3 3"/>
+    </svg>
+  </button>
+  <button id="sidebar-restore" title="Show panel">
+    <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 2L3 5l3 3"/>
+    </svg>
+  </button>
+
   <!-- ANALOG PANE -->
   <div class="map-pane" id="pane-analog">
     <div class="pane-label">Analog</div>
@@ -623,16 +636,6 @@
     <div class="info-panel" id="info-panel-analog">
       <div class="info-summary" id="info-summary-analog"></div>
     </div>
-    <button id="sidebar-collapse" title="Collapse panel">
-      <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M6 2L3 5l3 3"/>
-      </svg>
-    </button>
-    <button id="sidebar-restore" title="Show panel">
-      <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M6 2L3 5l3 3"/>
-      </svg>
-    </button>
   </div>
 
   <div class="split-divider"></div>
@@ -742,7 +745,7 @@ const DIGITAL_HIDDEN_OVERLAYS = ['digital_community','digital_shared','digital_p
 
 // ── SHARED STATE ──────────────────────────────────────────────────────────
 const activeFilters = {};
-let currentMode = 'analog'; // 'analog' | 'digital' | 'split'
+let currentMode = 'split'; // 'analog' | 'digital' | 'split'
 
 // ── CSV PARSE ──────────────────────────────────────────────────────────────
 function parseCSV(raw) {
@@ -768,9 +771,18 @@ const data = parseCSV(RAW_CSV);
 const byId = {};
 data.forEach(d => { byId[d.orb_ID.trim()] = d; });
 
+// Fields that are genuinely comma-separated multi-value
+const MULTI_VALUE_FIELDS = new Set(['trigger', 'connection', 'weather', 'theme']);
+
 function valuesFor(row, key) {
   if (!row) return [];
-  return (row[key] || '').split(',').map(s => s.trim()).filter(Boolean);
+  const raw = (row[key] || '').trim();
+  if (!raw) return [];
+  if (MULTI_VALUE_FIELDS.has(key)) {
+    return raw.split(',').map(s => s.trim()).filter(Boolean);
+  }
+  // Single-value field (may contain commas in the value itself)
+  return [raw];
 }
 
 // ── PER-MAP STATE ─────────────────────────────────────────────────────────

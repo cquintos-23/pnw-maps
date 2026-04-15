@@ -22,6 +22,45 @@
     --font: 'articulat-cf', 'DM Sans', sans-serif;
   }
 
+  /* ── MOBILE OVERLAY ── */
+  #mobile-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: var(--bg);
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJBTkFMT0ciIGNsaXAtcGF0aD0idXJsKCNjbGlwMF8zMTlfODU5KSI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjM0Y0NjUyIi8+CjxnIGlkPSJhbmFsb2dfbm9pc2UiPgo8ZyBpZD0iUmVjdGFuZ2xlIDEwOSIgb3BhY2l0eT0iMC41IiBmaWx0ZXI9InVybCgjZmlsdGVyMF9uXzMxOV84NTkpIj4KPHBhdGggZD0iTTAgMEgzNjQwVjI2MDBIMFYwWiIgZmlsbD0iIzE5MjEyRSIvPgo8L2c+CjwvZz4KPC9nPgo8ZGVmcz4KPGZpbHRlciBpZD0iZmlsdGVyMF9uXzMxOV84NTkiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNjQwIiBoZWlnaHQ9IjI2MDAiIGZpbHRlclVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgY29sb3ItaW50ZXJwb2xhdGlvbi1maWx0ZXJzPSJzUkdCIj4KPGZlRmxvb2QgZmxvb2Qtb3BhY2l0eT0iMCIgcmVzdWx0PSJCYWNrZ3JvdW5kSW1hZ2VGaXgiLz4KPGZlQmxlbmQgbW9kZT0ibm9ybWFsIiBpbj0iU291cmNlR3JhcGhpYyIgaW4yPSJCYWNrZ3JvdW5kSW1hZ2VGaXgiIHJlc3VsdD0ic2hhcGUiLz4KPGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjIgMiIgc3RpdGNoVGlsZXM9InN0aXRjaCIgbnVtT2N0YXZlcz0iMyIgcmVzdWx0PSJub2lzZSIgc2VlZD0iODUyOSIgLz4KPGZlQ29sb3JNYXRyaXggaW49Im5vaXNlIiB0eXBlPSJsdW1pbmFuY2VUb0FscGhhIiByZXN1bHQ9ImFscGhhTm9pc2UiIC8+CjxmZUNvbXBvbmVudFRyYW5zZmVyIGluPSJhbHBoYU5vaXNlIiByZXN1bHQ9ImNvbG9yZWROb2lzZTEiPgo8ZmVGdW5jQSB0eXBlPSJkaXNjcmV0ZSIgdGFibGVWYWx1ZXM9IjEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgIi8+CjwvZmVDb21wb25lbnRUcmFuc2Zlcj4KPGZlQ29tcG9zaXRlIG9wZXJhdG9yPSJpbiIgaW4yPSJzaGFwZSIgaW49ImNvbG9yZWROb2lzZTEiIHJlc3VsdD0ibm9pc2UxQ2xpcHBlZCIgLz4KPGZlQ29tcG9uZW50VHJhbnNmZXIgaW49ImFscGhhTm9pc2UiIHJlc3VsdD0iY29sb3JlZE5vaXNlMiI+CjxmZUZ1bmNBIHR5cGU9ImRpc2NyZXRlIiB0YWJsZVZhbHVlcz0iMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAxIDEgMSAiLz4KPC9mZUNvbXBvbmVudFRyYW5zZmVyPgo8ZmVDb21wb3NpdGUgb3BlcmF0b3I9ImluIiBpbjI9InNoYXBlIiBpbj0iY29sb3JlZE5vaXNlMiIgcmVzdWx0PSJub2lzZTJDbGlwcGVkIiAvPgo8ZmVGbG9vZCBmbG9vZC1jb2xvcj0icmdiYSgyNSwgMzMsIDQ2LCAwLjI1KSIgcmVzdWx0PSJjb2xvcjFGbG9vZCIgLz4KPGZlQ29tcG9zaXRlIG9wZXJhdG9yPSJpbiIgaW4yPSJub2lzZTFDbGlwcGVkIiBpbj0iY29sb3IxRmxvb2QiIHJlc3VsdD0iY29sb3IxIiAvPgo8ZmVGbG9vZCBmbG9vZC1jb2xvcj0icmdiYSgyNTUsIDI1NSwgMjU1LCAwLjI1KSIgcmVzdWx0PSJjb2xvcjJGbG9vZCIgLz4KPGZlQ29tcG9zaXRlIG9wZXJhdG9yPSJpbiIgaW4yPSJub2lzZTJDbGlwcGVkIiBpbj0iY29sb3IyRmxvb2QiIHJlc3VsdD0iY29sb3IyIiAvPgo8ZmVNZXJnZSByZXN1bHQ9ImVmZmVjdDFfbm9pc2VfMzE5Xzg1OSI+CjxmZU1lcmdlTm9kZSBpbj0ic2hhcGUiIC8+CjxmZU1lcmdlTm9kZSBpbj0iY29sb3IxIiAvPgo8ZmVNZXJnZU5vZGUgaW49ImNvbG9yMiIgLz4KPC9mZU1lcmdlPgo8L2ZpbHRlcj4KPGNsaXBQYXRoIGlkPSJjbGlwMF8zMTlfODU5Ij4KPHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IndoaXRlIi8+CjwvY2xpcFBhdGg+CjwvZGVmcz4KPC9zdmc+Cg==");
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 40px;
+    text-align: center;
+  }
+  @media (max-width: 900px) {
+    #mobile-overlay { display: flex; }
+  }
+  #mobile-overlay svg.mobile-icon {
+    width: 48px;
+    height: 48px;
+    opacity: 0.4;
+  }
+  #mobile-overlay h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: -0.02em;
+  }
+  #mobile-overlay p {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    max-width: 280px;
+    letter-spacing: -0.01em;
+  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
@@ -614,6 +653,19 @@
 
     <button id="clear-filters">Clear all filters</button>
   </div>
+</div>
+
+<!-- MOBILE OVERLAY -->
+<div id="mobile-overlay">
+  <svg class="mobile-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="14" y="4" width="20" height="32" rx="3" stroke="currentColor" stroke-width="2"/>
+    <circle cx="24" cy="31" r="1.5" fill="currentColor"/>
+    <path d="M6 18h8M34 18h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <path d="M38 14l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M10 14L6 18l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <h2>Best viewed on desktop</h2>
+  <p>This interactive map is designed for larger screens. Please open it on a desktop or laptop for the full experience.</p>
 </div>
 
 <!-- MAP AREA -->

@@ -57,19 +57,42 @@
     border-bottom: 1px solid var(--border);
   }
 
+  #sidebar-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2px;
+  }
   #sidebar-header h1 {
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 0;
     text-transform: uppercase;
     color: var(--text-bright);
-    margin-bottom: 2px;
   }
   #sidebar-header p {
     font-size: 11px;
     color: var(--text-dim);
     letter-spacing: 0;
   }
+  #node-builder-sidebar {
+    padding: 4px 9px;
+    background: #d3d0ca;
+    border: 1px solid var(--accent);
+    border-radius: 3px;
+    color: var(--accent);
+    font-size: 10px;
+    font-family: 'articulat-cf', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+  #node-builder-sidebar:hover { background: #fff; }
 
   /* ── MAP MODE SWITCHER ── */
   #mode-switcher {
@@ -401,37 +424,24 @@
   }
   .zoom-btn:hover { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
 
-  .top-btn-group {
-    position: absolute;
-    top: 18px;
-    right: 24px;
-    display: flex;
-    gap: 6px;
-    z-index: 10;
-  }
-
-  .reset-zoom-btn, .node-builder-btn {
-    padding: 6px 12px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border);
-    border-radius: 3px;
+  .reset-zoom-btn {
+    width: 32px; height: 32px;
+    background: var(--surface);
+    border: 1px solid var(--border-hover);
+    border-radius: 7px;
     color: var(--text-dim);
-    font-size: 10px;
-    font-family: 'articulat-cf', sans-serif;
+    font-size: 15px;
+    font-family: var(--font);
     font-weight: 700;
     letter-spacing: -0.02em;
     cursor: pointer;
-    transition: all 0.15s;
-    text-decoration: none;
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    margin-top: 4px;
   }
   .reset-zoom-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .node-builder-btn {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-  .node-builder-btn:hover { background: rgba(81,84,240,0.12); }
 
   /* ── ACTIVE FILTER TAGS ── */
   .active-tags {
@@ -450,8 +460,8 @@
 
   .active-tag {
     background: var(--accent-soft);
-    border: 1px solid rgba(81,84,240,0.3);
-    color: var(--accent);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--accent-soft);
     font-size: 10px;
     padding: 3px 8px;
     border-radius: 12px;
@@ -562,16 +572,19 @@
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div id="sidebar-header">
-    <h1>Memory Map</h1>
-    <p>Pacific Northwest</p>
+    <div id="sidebar-header-top">
+      <h1 id="sidebar-title">Memory Map</h1>
+      <a id="node-builder-sidebar" href="https://cquintos-23.github.io/nostalgia/" target="_self">Node builder</a>
+    </div>
+    <p id="sidebar-subtitle">Pacific Northwest</p>
   </div>
 
   <div id="mode-switcher">
     <div class="mode-label">View</div>
     <div class="mode-btn-group">
+      <button class="mode-btn active-split" data-mode="split">Split</button>
       <button class="mode-btn" data-mode="analog">Analog</button>
       <button class="mode-btn" data-mode="digital">Digital</button>
-      <button class="mode-btn active-split" data-mode="split">Split</button>
     </div>
   </div>
 
@@ -625,13 +638,10 @@
       <div id="loading-analog">Loading Analog map…</div>
     </div>
     <div class="active-tags" id="active-tags-analog"></div>
-    <div class="top-btn-group">
-      <button class="reset-zoom-btn" id="reset-zoom-analog">Reset view</button>
-      <a class="node-builder-btn" href="https://cquintos-23.github.io/nostalgia/" target="_self">Node builder</a>
-    </div>
     <div class="zoom-controls">
       <button class="zoom-btn" id="zoom-in-analog">+</button>
       <button class="zoom-btn" id="zoom-out-analog">−</button>
+      <button class="reset-zoom-btn" id="reset-zoom-analog">↺</button>
     </div>
     <div class="info-panel" id="info-panel-analog">
       <div class="info-summary" id="info-summary-analog"></div>
@@ -647,13 +657,10 @@
       <div id="loading-digital">Loading Digital map…</div>
     </div>
     <div class="active-tags" id="active-tags-digital"></div>
-    <div class="top-btn-group">
-      <button class="reset-zoom-btn" id="reset-zoom-digital">Reset view</button>
-      <a class="node-builder-btn" href="https://cquintos-23.github.io/nostalgia/" target="_self">Node builder</a>
-    </div>
     <div class="zoom-controls">
       <button class="zoom-btn" id="zoom-in-digital">+</button>
       <button class="zoom-btn" id="zoom-out-digital">−</button>
+      <button class="reset-zoom-btn" id="reset-zoom-digital">↺</button>
     </div>
     <div class="info-panel" id="info-panel-digital">
       <div class="info-summary" id="info-summary-digital"></div>
@@ -716,15 +723,15 @@ digital_9,Forest,A snow-bent fir branch became a winter shelter for siblings in 
 
 // ── FILTER DEFINITIONS ─────────────────────────────────────────────────────
 const FILTERS = [
+  { key: 'memory type',    label: 'Memory type',         options: ['Shared by a collective group, culture, or community','Shared between myself and specific others','Unsure','Personal and specific to me'] },
   { key: 'theme',          label: 'Memory content',      options: ['general','people','nature itself','outdoor activity','family trip'] },
   { key: 'time',           label: 'Life stage',          options: ['Young adulthood (ages 18-25)','Childhood (ages 0-12)','Ongoing (this is a recurring or continuous experience)','Adolescence (ages 13-18)'] },
-  { key: 'memory type',    label: 'Memory type',         options: ['Shared by a collective group, culture, or community','Shared between myself and specific others','Unsure','Personal and specific to me'] },
-  { key: 'area',           label: 'Area of residence',   options: ['Mixed/unsure','Suburban (residential areas outside city centers)','Rural (countryside, farmland, small towns)','Urban (city center, dense downtown area)'] },
   { key: 'residence',      label: 'Current resident',    options: ['No','Yes'] },
-  { key: 'trigger',        label: 'Triggers',            options: ['people','places','physical objects','food or drink','weather','music','visual media','smells','interactions and conversations','textures','events','holidays','other'] },
+  { key: 'area',           label: 'Area of residence',   options: ['Mixed/unsure','Suburban (residential areas outside city centers)','Rural (countryside, farmland, small towns)','Urban (city center, dense downtown area)'] },
   { key: 'connection',     label: 'Sense of connection', options: ['My current self','My past self','My home','Specific people involved in the memory','A broader community','The place itself','A particular time in my life','Other'] },
   { key: 'transformation', label: 'Place transformation',options: ['No, it remains largely the same','Unsure','Yes, it has changed significantly','Yes, it no longer exists'] },
   { key: 'weather',        label: 'Role of weather',     options: ['It is a primary aspect of the memory','It is a secondary aspect of the memory','It enhances my emotional experience when recalling it','It triggers my memory','Weather or season plays no significant role','Unsure'] },
+  { key: 'trigger',        label: 'Triggers',            options: ['people','places','physical objects','food or drink','weather','music','visual media','smells','interactions and conversations','textures','events','holidays','other'] },
 ];
 
 // ── OVERLAY MAPS ────────────────────────────────────────────────────────────
@@ -865,6 +872,13 @@ function createMapController(prefix) {
       const nodeEl = getLayerEl(id);
       if (nodeEl) nodeEl.style.opacity = '0.2';
     });
+    // In split mode, dim all peer orbs too
+    if (currentMode === 'split' && _peer) {
+      _peer.getState().orbs.forEach(id => {
+        const peerEl = _peer.getLayerEl(id);
+        if (peerEl) peerEl.style.opacity = '0.2';
+      });
+    }
     showInfo(orbId, byId[orbId]);
   }
 
@@ -879,8 +893,19 @@ function createMapController(prefix) {
       const el = getLayerEl(id);
       if (el) { el.style.opacity = ''; el.style.filter = ''; }
     });
+    // Restore peer orbs opacity in split mode
+    if (currentMode === 'split' && _peer) {
+      _peer.getState().orbs.forEach(id => {
+        const peerEl = _peer.getLayerEl(id);
+        if (peerEl) peerEl.style.opacity = '';
+      });
+    }
     infoPanel.classList.remove('visible');
-    if (doApply) applyState();
+    if (doApply) {
+      applyState();
+      // Restore connections overlay if toggle is still on
+      if (document.getElementById('connections-toggle').checked) syncConnections();
+    }
   }
 
   // ── PUBLIC: highlight a memory-type group (called directly or by peer sync) ──
@@ -918,6 +943,7 @@ function createMapController(prefix) {
 
       el.addEventListener('mouseenter', () => {
         if (state.activeNode) return;
+        if (document.getElementById('connections-toggle').checked) return;
         const row = byId[orbId];
         const memType = row ? (row['memory type'] || '').trim() : '';
         highlightMemType(memType);
@@ -927,6 +953,7 @@ function createMapController(prefix) {
 
       el.addEventListener('mouseleave', () => {
         if (state.activeNode) return;
+        if (document.getElementById('connections-toggle').checked) return;
         clearHighlight();
         // Sync peer in split mode
         if (currentMode === 'split' && _peer) _peer.clearHighlight();
@@ -934,6 +961,8 @@ function createMapController(prefix) {
 
       el.addEventListener('click', e => {
         e.stopPropagation();
+        // In split mode, clear any hover highlights on the peer pane first
+        if (currentMode === 'split' && _peer) _peer.clearHighlight();
         state.activeNode === orbId ? clearNodeSelection() : selectNode(orbId);
       });
     });
@@ -1058,6 +1087,7 @@ function createMapController(prefix) {
     clearHighlight,
     HIDDEN_OVERLAYS,
     getState: () => state,
+    getLayerEl,
     setPeer: (peer) => { _peer = peer; },
   };
 }
@@ -1094,11 +1124,21 @@ function setMode(mode) {
     }
   });
 
-  // Update sidebar title
-  const h1 = document.querySelector('#sidebar-header h1');
-  if (mode === 'analog')  h1.textContent = 'Analog Memory';
-  if (mode === 'digital') h1.textContent = 'Digital Memory';
-  if (mode === 'split')   h1.textContent = 'Memory Map';
+  // Update sidebar title + counts
+  const h1 = document.querySelector('#sidebar-title');
+  const subtitle = document.querySelector('#sidebar-subtitle');
+  const analogCount = data.filter(d => d.orb_ID.trim().startsWith('analog_')).length;
+  const digitalCount = data.filter(d => d.orb_ID.trim().startsWith('digital_')).length;
+  if (mode === 'analog') {
+    h1.textContent = `Analog Memory: ${analogCount}`;
+    subtitle.textContent = 'Pacific Northwest';
+  } else if (mode === 'digital') {
+    h1.textContent = `Digital Memory: ${digitalCount}`;
+    subtitle.textContent = 'Pacific Northwest';
+  } else {
+    h1.textContent = 'Memory Map';
+    subtitle.textContent = `Analog: ${analogCount} · Digital: ${digitalCount}`;
+  }
 
   // Re-sync basemap/connections toggles to both maps after layout change
   syncBasemap();
@@ -1108,6 +1148,9 @@ function setMode(mode) {
 modeBtns.forEach(btn => {
   btn.addEventListener('click', () => setMode(btn.dataset.mode));
 });
+
+// Initialize title/counts for default split mode
+setMode('split');
 
 // ── BASEMAP + QUOTES TOGGLE ────────────────────────────────────────────────
 function syncBasemap() {

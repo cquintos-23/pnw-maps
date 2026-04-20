@@ -114,25 +114,6 @@
     color: var(--text-dim);
     letter-spacing: 0;
   }
-  #node-builder-sidebar {
-    padding: 4px 9px;
-    background: #d3d0ca;
-    border: 1px solid var(--accent);
-    border-radius: 3px;
-    color: var(--accent);
-    font-size: 10px;
-    font-family: 'articulat-cf', sans-serif;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    white-space: nowrap;
-    transition: background 0.15s;
-  }
-  #node-builder-sidebar:hover { background: #fff; }
-
   /* ── MAP MODE SWITCHER ── */
   #mode-switcher {
     padding: 12px 18px;
@@ -357,7 +338,81 @@
   #clear-filters:hover { border-color: var(--accent); color: var(--accent); }
   #clear-filters.visible { display: block; }
 
-  /* ── MAP AREA ── */
+  /* ── SIDEBAR BOTTOM NAV ── */
+  #sidebar-bottom-nav {
+    flex-shrink: 0;
+    border-top: 1px solid var(--border);
+    padding: 10px 12px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    background: var(--surface);
+  }
+
+  .sidebar-nav-btn {
+    flex: 1;
+    padding: 6px 8px;
+    background: transparent;
+    border: 1px solid rgba(162,187,255,0.45);
+    border-radius: 4px;
+    color: #E2E2E2;
+    font-size: 10px;
+    font-family: var(--font);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .sidebar-nav-btn:hover {
+    background: rgba(162,187,255,0.1);
+    border-color: #A2BBFF;
+  }
+
+  .sidebar-nav-btn.icon-btn {
+    flex: 0 0 30px;
+    padding: 6px 4px;
+  }
+
+  /* ── TOOLTIP (mode buttons) ── */
+  [title] {
+    position: relative;
+  }
+  .mode-btn[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: calc(100% + 7px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e2736;
+    border: 1px solid rgba(162,187,255,0.3);
+    color: #E2E2E2;
+    font-size: 10px;
+    font-family: var(--font);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    padding: 5px 9px;
+    border-radius: 4px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 999;
+    line-height: 1.4;
+  }
+  .mode-btn[title]:hover::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: rgba(162,187,255,0.3);
+    pointer-events: none;
+    z-index: 999;
+  }
   #map-area {
     flex: 1;
     display: flex;
@@ -483,30 +538,6 @@
   .reset-zoom-btn:hover { border-color: var(--accent); color: var(--accent); }
 
   /* ── ACTIVE FILTER TAGS ── */
-  .active-tags {
-    position: absolute;
-    top: 18px;
-    left: 18px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    max-width: 60%;
-    z-index: 10;
-    pointer-events: none;
-  }
-  /* In split mode, push analog tags down to avoid overlap with label */
-  body.mode-split .active-tags { top: 42px; }
-
-  .active-tag {
-    background: var(--accent-soft);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: var(--accent-soft);
-    font-size: 10px;
-    padding: 3px 8px;
-    border-radius: 12px;
-    letter-spacing: 0;
-  }
-
   /* ── INFO CARD ── */
   .info-panel {
     position: absolute;
@@ -612,10 +643,9 @@
 <div id="sidebar">
   <div id="sidebar-header">
     <div id="sidebar-header-top">
-      <h1 id="sidebar-title">Memory Map</h1>
-      <a id="node-builder-sidebar" href="https://cquintos-23.github.io/nostalgia/" target="_self">Node builder</a>
+      <h1 id="sidebar-title">Pacific Northwest</h1>
     </div>
-    <p id="sidebar-subtitle">Pacific Northwest</p>
+    <p id="sidebar-subtitle">Born 1966–1978 · Born 1990–2002</p>
   </div>
 
   <div id="mode-switcher">
@@ -653,6 +683,14 @@
 
     <button id="clear-filters">Clear all filters</button>
   </div>
+
+  <!-- STICKY BOTTOM NAV -->
+  <div id="sidebar-bottom-nav">
+    <button class="sidebar-nav-btn" id="btn-home-nav">Home</button>
+    <button class="sidebar-nav-btn icon-btn" id="btn-help-nav">?</button>
+    <button class="sidebar-nav-btn" id="btn-nodebuilder-nav">Node Builder</button>
+    <a class="sidebar-nav-btn" href="https://cquintos-23.github.io/database/#database" id="btn-nostalgia-nav">Database</a>
+  </div>
 </div>
 
 <!-- MOBILE OVERLAY -->
@@ -685,11 +723,10 @@
 
   <!-- ANALOG PANE -->
   <div class="map-pane" id="pane-analog">
-    <div class="pane-label">Analog</div>
+    <div class="pane-label">Born 1966–1978</div>
     <div class="svg-wrapper" id="svg-wrapper-analog">
       <div id="loading-analog">Loading Analog map…</div>
     </div>
-    <div class="active-tags" id="active-tags-analog"></div>
     <div class="zoom-controls">
       <button class="zoom-btn" id="zoom-in-analog">+</button>
       <button class="zoom-btn" id="zoom-out-analog">−</button>
@@ -704,11 +741,10 @@
 
   <!-- DIGITAL PANE -->
   <div class="map-pane" id="pane-digital">
-    <div class="pane-label">Digital</div>
+    <div class="pane-label">Born 1990–2002</div>
     <div class="svg-wrapper" id="svg-wrapper-digital">
       <div id="loading-digital">Loading Digital map…</div>
     </div>
-    <div class="active-tags" id="active-tags-digital"></div>
     <div class="zoom-controls">
       <button class="zoom-btn" id="zoom-in-digital">+</button>
       <button class="zoom-btn" id="zoom-out-digital">−</button>
@@ -1182,13 +1218,13 @@ function setMode(mode) {
   const analogCount = data.filter(d => d.orb_ID.trim().startsWith('analog_')).length;
   const digitalCount = data.filter(d => d.orb_ID.trim().startsWith('digital_')).length;
   if (mode === 'analog') {
-    h1.textContent = `Analog Memory: ${analogCount}`;
-    subtitle.textContent = 'Pacific Northwest';
+    h1.textContent = 'Pacific Northwest';
+    subtitle.textContent = 'Born 1966–1978';
   } else if (mode === 'digital') {
-    h1.textContent = `Digital Memory: ${digitalCount}`;
-    subtitle.textContent = 'Pacific Northwest';
+    h1.textContent = 'Pacific Northwest';
+    subtitle.textContent = 'Born 1990–2002';
   } else {
-    h1.textContent = 'Memory Map';
+    h1.textContent = 'Pacific Northwest';
     subtitle.textContent = `Analog: ${analogCount} · Digital: ${digitalCount}`;
   }
 
@@ -1219,12 +1255,21 @@ function syncBasemap() {
 
 function syncConnections() {
   const on = document.getElementById('connections-toggle').checked;
+  const hasFilters = Object.keys(activeFilters).length > 0;
   [
     { map: analogMap,  overlays: ANALOG_HIDDEN_OVERLAYS  },
     { map: digitalMap, overlays: DIGITAL_HIDDEN_OVERLAYS },
   ].forEach(({ map, overlays }) => {
-    if (on) overlays.forEach(id => map.setOverlay(id, true));
-    else    map.hideAllOverlays();
+    if (on) {
+      overlays.forEach(id => {
+        map.setOverlay(id, true);
+        // Dim to 0.2 when filters are active, full opacity otherwise
+        const el = map.getLayerEl(id);
+        if (el) el.style.opacity = hasFilters ? '0.2' : '';
+      });
+    } else {
+      map.hideAllOverlays();
+    }
   });
 }
 
@@ -1275,6 +1320,7 @@ function onFilterChange(e) {
   updateFilterUI();
   analogMap.applyState();
   digitalMap.applyState();
+  syncConnections();
 }
 
 function updateFilterUI() {
@@ -1289,20 +1335,6 @@ function updateFilterUI() {
     el.classList.toggle('visible', count > 0);
   });
 
-  // Update active tags on both panes
-  ['analog','digital'].forEach(prefix => {
-    const tagsEl = document.getElementById(`active-tags-${prefix}`);
-    if (!tagsEl) return;
-    tagsEl.innerHTML = '';
-    Object.entries(activeFilters).forEach(([, vals]) => {
-      vals.forEach(v => {
-        const tag = document.createElement('span');
-        tag.className = 'active-tag';
-        tag.textContent = v.length > 28 ? v.slice(0, 26) + '…' : v;
-        tagsEl.appendChild(tag);
-      });
-    });
-  });
 }
 
 document.getElementById('clear-filters').addEventListener('click', () => {
@@ -1311,6 +1343,18 @@ document.getElementById('clear-filters').addEventListener('click', () => {
   updateFilterUI();
   analogMap.applyState();
   digitalMap.applyState();
+  syncConnections();
+});
+
+// ── SIDEBAR BOTTOM NAV ────────────────────────────────────────────────────
+document.getElementById('btn-nodebuilder-nav').addEventListener('click', () => {
+  window.location.href = 'https://cquintos-23.github.io/database/#nodebuilder';
+});
+document.getElementById('btn-home-nav').addEventListener('click', () => {
+  window.location.href = 'https://cquintos-23.github.io/nostalgia/#home';
+});
+document.getElementById('btn-help-nav').addEventListener('click', () => {
+  window.location.href = 'https://cquintos-23.github.io/nostalgia/#info';
 });
 
 // ── SIDEBAR COLLAPSE ───────────────────────────────────────────────────────
